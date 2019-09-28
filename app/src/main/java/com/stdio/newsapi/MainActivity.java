@@ -64,54 +64,19 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
 
         group1.setHeaderItem(getString(R.string.news_header_top_stories));
         news = new News();
-        news.setNewsTitle(getString(R.string.news_title1));
         news.setNewsBody(getString(R.string.news_body1));
-        group1.addItem(news);
-
-        news = new News();
-        news.setNewsTitle(getString(R.string.news_title2));
-        news.setNewsBody(getString(R.string.news_body2));
-        group1.addItem(news);
-
-        news = new News();
-        news.setNewsTitle(getString(R.string.news_title_3));
-        news.setNewsBody(getString(R.string.news_body3));
         group1.addItem(news);
 
         CollectionView.InventoryGroup<String, News> group2 = inventory.newGroup(2);
         group2.setHeaderItem(getString(R.string.news_header_world));
-
-        news = new News();
-        news.setNewsTitle(getString(R.string.news_title4));
         news.setNewsBody(getString(R.string.news_body4));
         group2.addItem(news);
 
-        news = new News();
-        news.setNewsTitle(getString(R.string.news_title5));
-        news.setNewsBody(getString(R.string.news_body5));
-        group2.addItem(news);
-
-
-
         CollectionView.InventoryGroup<String, News> group3 = inventory.newGroup(3); // 2 is smaller than 10, displayed second
         group3.setHeaderItem(getString(R.string.news_header_australia));
-
         news = new News();
-        news.setNewsTitle(getString(R.string.news_title6));
         news.setNewsBody(getString(R.string.news_body6));
         group3.addItem(news);
-
-        news = new News();
-        news.setNewsTitle(getString(R.string.news_title7));
-        news.setNewsBody(getString(R.string.news_body7));
-        group3.addItem(news);
-
-
-        news = new News();
-        news.setNewsTitle(getString(R.string.news_title8));
-        news.setNewsBody(getString(R.string.news_body8));
-        group3.addItem(news);
-
 
         mCollectionView.updateInventory(inventory);
     }
