@@ -55,32 +55,6 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
 
         mCollectionView = (CollectionView) findViewById(R.id.collectionView);
         mCollectionView.setCollectionCallbacks(this);
-
-        inventory = new CollectionView.Inventory<>();
-
-        // groupOrdinal dictates the sequence of groups to be displayed in the list,
-        // the groups will be displayed in an ascending order on groupOrdinal
-        int groupOrdinal = 0;
-        CollectionView.InventoryGroup<String, News> group1 = inventory.newGroup(groupOrdinal);
-        News news;
-
-        group1.setHeaderItem(getString(R.string.news_header_top_stories));
-        news = new News();
-        news.setNewsBody(getString(R.string.news_body1));
-        group1.addItem(news);
-
-        CollectionView.InventoryGroup<String, News> group2 = inventory.newGroup(2);
-        group2.setHeaderItem(getString(R.string.news_header_world));
-        news.setNewsBody(getString(R.string.news_body4));
-        group2.addItem(news);
-
-        CollectionView.InventoryGroup<String, News> group3 = inventory.newGroup(3); // 2 is smaller than 10, displayed second
-        group3.setHeaderItem(getString(R.string.news_header_australia));
-        news = new News();
-        news.setNewsBody(getString(R.string.news_body6));
-        group3.addItem(news);
-
-        mCollectionView.updateInventory(inventory);
     }
 
     @Override
@@ -183,8 +157,21 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
         spNews.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent,
                                        View itemSelected, int selectedItemPosition, long selectedId) {
+                inventory = new CollectionView.Inventory<>();
+                // groupOrdinal dictates the sequence of groups to be displayed in the list,
+                // the groups will be displayed in an ascending order on groupOrdinal
+                News news;
 
-                tvResult.setText(spinnerAdapter.getItem(selectedItemPosition).description);
+                int count = selectedItemPosition;
+                while (!spinnerAdapter.getItem(count).isHeader) {
+                    CollectionView.InventoryGroup<String, News> group1 = inventory.newGroup(count);
+                    news = new News();
+                    group1.setHeaderItem(spinnerAdapter.getItem(count).name);
+                    news.setNewsBody(spinnerAdapter.getItem(count).description);
+                    group1.addItem(news);
+                    mCollectionView.updateInventory(inventory);
+                    count++;
+                }
             }
 
             public void onNothingSelected(AdapterView<?> parent) {

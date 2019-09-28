@@ -43,6 +43,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:gravity="center_vertical|left"
-        android:textAppearance="@style/TextAppearance.Title"/>
+        android:textAppearance="@style/TextAppearance.Title"
+        android:textColor="@color/colorPrimaryDark"/>
 </androidx.cardview.widget.CardView>
 
