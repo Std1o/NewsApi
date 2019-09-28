@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
     private CollectionView<String, News> mCollectionView;
     private CollectionView.Inventory<String, News> inventory;
     public static final String TAG = "MainActivity";
+    ArrayAdapter<NewsSpinnerModel> spinnerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
     private void initSpinner() {
         spNews = findViewById(R.id.sp_news);
 
-        ArrayAdapter<NewsSpinnerModel> spinnerAdapter = new ArrayAdapter<NewsSpinnerModel>(this, android.R.layout.simple_spinner_dropdown_item, newsModel) {
+        spinnerAdapter = new ArrayAdapter<NewsSpinnerModel>(this, android.R.layout.simple_spinner_dropdown_item, newsModel) {
 
             @Override
             public boolean isEnabled(int position) {
@@ -177,6 +179,19 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
         spNews.setSelection(1);//Header should not be selected
     }
 
+    private void newsSpinnerSetOnItemSelectedListener() {
+        spNews.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent,
+                                       View itemSelected, int selectedItemPosition, long selectedId) {
+
+                tvResult.setText(spinnerAdapter.getItem(selectedItemPosition).description);
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
     public void getData() {
         requestData();
     }
@@ -190,25 +205,26 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
                     @Override
                     public void onResponse(String response) {
                         JSONObject obj;
-                        newsModel.add(new NewsSpinnerModel(true, sources.get(i).getName()));
+                        newsModel.add(new NewsSpinnerModel(true, sources.get(i).getName(), "", ""));
                         if (i == sources.size() - 1) {
                             try {
                                 obj = new JSONObject(response);
                                 for (int j = 0; j < 5; j++) {
                                     JSONObject articles = obj.getJSONArray("articles").getJSONObject(j);
-                                    newsModel.add(new NewsSpinnerModel(false, articles.getString("title")));
+                                    newsModel.add(new NewsSpinnerModel(false, articles.getString("title"), articles.getString("description"), articles.getString("url")));
                                 }
                             } catch (JSONException e) {
                                 System.out.println(e.getMessage());
                             }
                             initSpinner();
+                            newsSpinnerSetOnItemSelectedListener();
                         }
                         else {
                             try {
                                 obj = new JSONObject(response);
                                 for (int j = 0; j < 5; j++) {
                                     JSONObject articles = obj.getJSONArray("articles").getJSONObject(j);
-                                    newsModel.add(new NewsSpinnerModel(false, articles.getString("title")));
+                                    newsModel.add(new NewsSpinnerModel(false, articles.getString("title"), articles.getString("description"), articles.getString("url")));
                                 }
                             } catch (JSONException e) {
                                 System.out.println(e.getMessage());

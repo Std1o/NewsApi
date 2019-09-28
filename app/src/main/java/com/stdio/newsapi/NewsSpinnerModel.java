@@ -3,10 +3,14 @@ package com.stdio.newsapi;
 public class NewsSpinnerModel {
     boolean isHeader;
     String name;
+    String description;
+    String url;
 
-    public NewsSpinnerModel(boolean isHeader, String name) {
+    public NewsSpinnerModel(boolean isHeader, String name, String description, String url) {
         this.isHeader = isHeader;
         this.name = name;
+        this.description = description;
+        this.url = url;
     }
 
     public boolean isHeader() {
