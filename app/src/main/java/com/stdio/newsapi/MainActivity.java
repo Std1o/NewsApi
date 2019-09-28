@@ -32,14 +32,23 @@ public class MainActivity extends AppCompatActivity {
     TextView tvResult;
     ArrayList<NewsSpinnerModel> newsModel = new ArrayList<>();
     AppCompatSpinner spNews;
+    ArrayList<SourcesModel> sources = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tvResult = findViewById(R.id.tvResult);
+        getSources();
         getData();
         initSpinner();
+    }
+
+    private void getSources() {
+        sources.add(new SourcesModel("Cointelegraph Bitcoin & Ethereum Blockchain", "cointelegraph.com"));
+        sources.add(new SourcesModel("The Wall Street Journal", "wsj.com"));
+        sources.add(new SourcesModel("Lifehacker", "lifehacker.com"));
+        sources.add(new SourcesModel("TechCrunch", "techcrunch.com"));
     }
 
     private void initSpinner() {
