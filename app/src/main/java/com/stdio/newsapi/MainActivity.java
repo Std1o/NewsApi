@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<NewsSpinnerModel> newsModel = new ArrayList<>();
     AppCompatSpinner spNews;
     ArrayList<SourcesModel> sources = new ArrayList<>();
+    String apiKey = "f500d8d177eb4f9981c46c3731f2de70";
+    int i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
         tvResult = findViewById(R.id.tvResult);
         getSources();
         getData();
-        initSpinner();
     }
 
     private void getSources() {
@@ -53,14 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void initSpinner() {
         spNews = findViewById(R.id.sp_news);
-        newsModel.add(new NewsSpinnerModel(true, "Cold Drinks"));
-        newsModel.add(new NewsSpinnerModel(false, "Coke"));
-        newsModel.add(new NewsSpinnerModel(false, "Sprite"));
-        newsModel.add(new NewsSpinnerModel(false, "Pepsi"));
-        newsModel.add(new NewsSpinnerModel(true, "Fruits Juice"));
-        newsModel.add(new NewsSpinnerModel(false, "Orange Juice"));
-        newsModel.add(new NewsSpinnerModel(false, "Strawberry Juice"));
-        newsModel.add(new NewsSpinnerModel(false, "Lemon Juice"));
 
         ArrayAdapter<NewsSpinnerModel> spinnerAdapter = new ArrayAdapter<NewsSpinnerModel>(this, android.R.layout.simple_spinner_dropdown_item, newsModel) {
 
@@ -119,20 +112,53 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getData() {
+        requestData();
+    }
+
+    private void requestData() {
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="https://newsapi.org/v2/everything?domains=google.com&apiKey=6486799f62994b81929ce7efa8f9a174&language=ru";
+        System.out.println("index " + i);
+        String url ="https://newsapi.org/v2/everything?domains=" + sources.get(i).domain + "&apiKey=" + apiKey;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         JSONObject obj;
-
-                        try {
-                            obj = new JSONObject(response);
-                            JSONObject articles = obj.getJSONArray("articles").getJSONObject(0);
-                            tvResult.setText(articles.getString("title"));
-                        } catch (JSONException e) {
-                            System.out.println(e.getMessage());
+                        newsModel.add(new NewsSpinnerModel(true, sources.get(i).getName()));
+                        if (i == sources.size() - 1) {
+                            try {
+                                obj = new JSONObject(response);
+                                for (int j = 0; j < 5; j++) {
+                                    JSONObject articles = obj.getJSONArray("articles").getJSONObject(j);
+                                    newsModel.add(new NewsSpinnerModel(false, articles.getString("title")));
+                                }
+                            } catch (JSONException e) {
+                                System.out.println(e.getMessage());
+                            }
+                            initSpinner();
+                        }
+                        else {
+                            try {
+                                obj = new JSONObject(response);
+                                for (int j = 0; j < 5; j++) {
+                                    JSONObject articles = obj.getJSONArray("articles").getJSONObject(j);
+                                    newsModel.add(new NewsSpinnerModel(false, articles.getString("title")));
+                                }
+                            } catch (JSONException e) {
+                                System.out.println(e.getMessage());
+                            }
+                            if (i == 0) {
+                                i++;
+                                requestData();
+                            }
+                            else if (i + 1 < sources.size()) {
+                                i++;
+                                requestData();
+                            }
+                            else if (i == sources.size() - 1) {
+                                requestData();
+                                i++;
+                            }
                         }
 
                     }
