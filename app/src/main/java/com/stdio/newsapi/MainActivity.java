@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
         };
 
         spNews.setAdapter(spinnerAdapter);
-        spNews.setSelection(0);//Header should not be selected
     }
 
     private void newsSpinnerSetOnItemSelectedListener() {
