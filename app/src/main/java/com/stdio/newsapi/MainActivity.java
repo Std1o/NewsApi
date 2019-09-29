@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSpinner;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -24,8 +26,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.ericliu.asyncexpandablelist.CollectionView;
-import com.ericliu.asyncexpandablelist.CollectionViewCallbacks;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,20 +33,17 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements CollectionViewCallbacks<String, News> {
+public class MainActivity extends AppCompatActivity {
 
     TextView tvResult;
     ArrayList<NewsSpinnerModel> newsModel = new ArrayList<>();
-    public static ArrayList<News> recyclerData = new ArrayList<>();
+    public static ArrayList<DataModel> dataList;
+    private RecyclerView rv;
     AppCompatSpinner spNews;
     ArrayList<SourcesModel> sources = new ArrayList<>();
     String apiKey = "f500d8d177eb4f9981c46c3731f2de70";
     int i = 0;
-    private CollectionView<String, News> mCollectionView;
-    private CollectionView.Inventory<String, News> inventory;
-    public static final String TAG = "MainActivity";
     ArrayAdapter<NewsSpinnerModel> spinnerAdapter;
-    News recyclerItem;
     public static Context mContext;
 
     @Override
@@ -57,41 +54,13 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
         mContext = this;
         getSources();
         getData();
-
-        mCollectionView = (CollectionView) findViewById(R.id.collectionView);
-        mCollectionView.setCollectionCallbacks(this);
+        initRecyclerView();
     }
 
-    @Override
-    public RecyclerView.ViewHolder newCollectionHeaderView(Context context, int groupOrdinal, ViewGroup parent) {
-        // Create a new view.
-        View v = LayoutInflater.from(context)
-                .inflate(R.layout.header_row_item, parent, false);
-
-        return new TitleHolder(v);
-    }
-
-    @Override
-    public RecyclerView.ViewHolder newCollectionItemView(Context context, int groupOrdinal, ViewGroup parent) {
-        // Create a new view.
-        View v = LayoutInflater.from(context)
-                .inflate(R.layout.text_row_item, parent, false);
-
-        return new NewsItemHolder(v);
-    }
-
-    @Override
-    public void bindCollectionHeaderView(Context context, RecyclerView.ViewHolder holder, int groupOrdinal, String headerItem) {
-        ((TitleHolder) holder).getTextView().setText((String) headerItem);
-    }
-
-    @Override
-    public void bindCollectionItemView(Context context, RecyclerView.ViewHolder holder, int groupOrdinal, News item) {
-        NewsItemHolder newsItemHolder = (NewsItemHolder) holder;
-        newsItemHolder.getTextViewTitle().setText(item.getNewsTitle());
-        newsItemHolder.getTextViewDescrption().setText(item.getNewsBody());
-        System.out.println("HEEELP " + item.getUrl());
-        recyclerData.add(item);
+    private void initRecyclerView() {
+        rv=(RecyclerView)findViewById(R.id.rv);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        rv.setLayoutManager(llm);
     }
 
     private void getSources() {
@@ -165,21 +134,13 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
         spNews.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent,
                                        View itemSelected, int selectedItemPosition, long selectedId) {
-                inventory = new CollectionView.Inventory<>();
-                // groupOrdinal dictates the sequence of groups to be displayed in the list,
-                // the groups will be displayed in an ascending order on groupOrdinal
-                News news;
-
+                dataList = new ArrayList<>();
                 int count = selectedItemPosition + 1;
                 System.out.println("size is " + newsModel.size());
                 while (count != newsModel.size() && !spinnerAdapter.getItem(count).isHeader) {
-                    CollectionView.InventoryGroup<String, News> group1 = inventory.newGroup(count);
-                    news = new News();
-                    group1.setHeaderItem(spinnerAdapter.getItem(count).name);
-                    news.setNewsBody(spinnerAdapter.getItem(count).description);
-                    news.setUrl(spinnerAdapter.getItem(count).url);
-                    group1.addItem(news);
-                    mCollectionView.updateInventory(inventory);
+                    dataList.add(new DataModel(spinnerAdapter.getItem(count).name, spinnerAdapter.getItem(count).description, spinnerAdapter.getItem(count).url));
+                    RVAdapter adapter = new RVAdapter(dataList, mContext);
+                    rv.setAdapter(adapter);
                     count++;
                 }
             }
@@ -249,49 +210,4 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
         });
         queue.add(stringRequest);
     }
-
-    public static class TitleHolder extends RecyclerView.ViewHolder {
-
-        private final TextView textView;
-
-        public TitleHolder(View itemView) {
-            super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.title);
-        }
-
-        public TextView getTextView() {
-            return textView;
-        }
-    }
-
-    public static class NewsItemHolder extends RecyclerView.ViewHolder {
-
-
-        private final TextView tvTitle;
-        private final TextView tvDescription;
-
-        public NewsItemHolder(View v) {
-            super(v);
-            // Define click listener for the ViewHolder's View.
-            v.setOnClickListener(new View.OnClickListener() {
-                MainActivity mainActivity = new MainActivity();
-                @Override
-                public void onClick(View v) {
-                    WebviewActivity.url = MainActivity.recyclerData.get(getAdapterPosition()-1).getUrl();
-                    MainActivity.mContext.startActivity(new Intent(MainActivity.mContext, WebviewActivity.class));
-                }
-            });
-            tvTitle = (TextView) v.findViewById(R.id.title);
-            tvDescription = (TextView) v.findViewById(R.id.description);
-        }
-
-        public TextView getTextViewTitle() {
-            return tvTitle;
-        }
-
-        public TextView getTextViewDescrption() {
-            return tvDescription;
-        }
-    }
-
 }
