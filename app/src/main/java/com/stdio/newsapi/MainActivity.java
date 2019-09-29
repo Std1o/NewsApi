@@ -35,7 +35,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView tvResult;
     ArrayList<NewsSpinnerModel> newsModel = new ArrayList<>();
     public static ArrayList<DataModel> dataList;
     private RecyclerView rv;
@@ -50,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        tvResult = findViewById(R.id.tvResult);
         mContext = this;
         getSources();
         getData();
