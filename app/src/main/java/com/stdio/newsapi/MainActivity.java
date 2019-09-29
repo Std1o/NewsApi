@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
 
             @Override
             public boolean isEnabled(int position) {
-                return !newsModel.get(position).isHeader();
+                return newsModel.get(position).isHeader();
             }
 
             @Override
@@ -137,12 +137,14 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
                 TextView tvName = v.findViewById(R.id.tvName);
                 NewsSpinnerModel model = newsModel.get(position);
                 if (!model.isHeader) {
-                    tvName.setPadding(50, 0,0,20);
+                    tvName.setPadding(50, 0,0,5);
                     tvName.setTypeface(null, Typeface.NORMAL);
+                    tvName.setTextSize(10);
                 }
                 else {
-                    tvName.setPadding(0, 0,0,0);
+                    tvName.setPadding(0, 10,0,10);
                     tvName.setTypeface(null, Typeface.BOLD);
+                    tvName.setTextSize(15);
                 }
                 tvName.setText(model.getName());
                 return v;
@@ -150,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
         };
 
         spNews.setAdapter(spinnerAdapter);
-        spNews.setSelection(1);//Header should not be selected
+        spNews.setSelection(0);//Header should not be selected
     }
 
     private void newsSpinnerSetOnItemSelectedListener() {
@@ -162,8 +164,9 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
                 // the groups will be displayed in an ascending order on groupOrdinal
                 News news;
 
-                int count = selectedItemPosition;
-                while (!spinnerAdapter.getItem(count).isHeader) {
+                int count = selectedItemPosition + 1;
+                System.out.println("size is " + newsModel.size());
+                while (count != newsModel.size() && !spinnerAdapter.getItem(count).isHeader) {
                     CollectionView.InventoryGroup<String, News> group1 = inventory.newGroup(count);
                     news = new News();
                     group1.setHeaderItem(spinnerAdapter.getItem(count).name);
