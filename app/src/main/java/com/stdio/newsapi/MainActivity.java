@@ -7,6 +7,7 @@ import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
 
     TextView tvResult;
     ArrayList<NewsSpinnerModel> newsModel = new ArrayList<>();
+    public static ArrayList<News> recyclerData = new ArrayList<>();
     AppCompatSpinner spNews;
     ArrayList<SourcesModel> sources = new ArrayList<>();
     String apiKey = "f500d8d177eb4f9981c46c3731f2de70";
@@ -44,12 +46,15 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
     private CollectionView.Inventory<String, News> inventory;
     public static final String TAG = "MainActivity";
     ArrayAdapter<NewsSpinnerModel> spinnerAdapter;
+    News recyclerItem;
+    public static Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tvResult = findViewById(R.id.tvResult);
+        mContext = this;
         getSources();
         getData();
 
@@ -85,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
         NewsItemHolder newsItemHolder = (NewsItemHolder) holder;
         newsItemHolder.getTextViewTitle().setText(item.getNewsTitle());
         newsItemHolder.getTextViewDescrption().setText(item.getNewsBody());
+        System.out.println("HEEELP " + item.getUrl());
+        recyclerData.add(item);
     }
 
     private void getSources() {
@@ -170,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
                     news = new News();
                     group1.setHeaderItem(spinnerAdapter.getItem(count).name);
                     news.setNewsBody(spinnerAdapter.getItem(count).description);
+                    news.setUrl(spinnerAdapter.getItem(count).url);
                     group1.addItem(news);
                     mCollectionView.updateInventory(inventory);
                     count++;
@@ -266,9 +274,11 @@ public class MainActivity extends AppCompatActivity implements CollectionViewCal
             super(v);
             // Define click listener for the ViewHolder's View.
             v.setOnClickListener(new View.OnClickListener() {
+                MainActivity mainActivity = new MainActivity();
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG, "Element " + getPosition() + " clicked.");
+                    WebviewActivity.url = MainActivity.recyclerData.get(getAdapterPosition()-1).getUrl();
+                    MainActivity.mContext.startActivity(new Intent(MainActivity.mContext, WebviewActivity.class));
                 }
             });
             tvTitle = (TextView) v.findViewById(R.id.title);
